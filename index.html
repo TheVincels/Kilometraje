@@ -53,11 +53,31 @@ ol.prio li{padding:8px 0;border-top:1px solid var(--line)}
 ol.prio li:first-child{border-top:0}
 .empty{color:var(--mut);text-align:center;padding:16px}
 .tie button{margin-top:8px}
+.hrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.hrow h1{margin:0}
+.adminbtn{background:none;border:1px solid var(--line);color:var(--mut);font-size:12px;padding:6px 12px;border-radius:99px;cursor:pointer;opacity:.75}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:50;align-items:center;justify-content:center;padding:16px}
+.modal .card{width:100%;max-width:360px;margin:0}
+.rec{margin-top:12px;padding:14px;border-radius:12px;font-weight:800;font-size:18px;text-align:center;border:1px solid}
+.rec.g{background:#0f3d1f;color:#4ade80;border-color:#22c55e}
+.rec.y{background:#3d3410;color:#facc15;border-color:#eab308}
+.rec.r{background:#3a0b10;color:#ff6b78;border-color:var(--red)}
+.tg{color:#4ade80;font-weight:700}.ty{color:#facc15;font-weight:700}.tr{color:#ff6b78;font-weight:700}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;color:var(--mut);font-weight:600;padding:8px 6px;border-bottom:1px solid var(--line)}
+.tbl td{padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+input[readonly]{opacity:.8}
+@media(max-width:640px){
+  .tbl thead{display:none}
+  .tbl tr{display:block;padding:10px 0;border-bottom:1px solid var(--line)}
+  .tbl td{display:flex;justify-content:space-between;gap:12px;border:0;padding:4px 0;text-align:right}
+  .tbl td::before{content:attr(data-l);color:var(--mut);text-align:left;flex:none}
+}
 </style>
 </head>
 <body>
 <header>
-  <h1>🛵 Control de <span>Repartidores</span></h1>
+  <div class="hrow"><h1>🛵 Control de <span>Repartidores</span></h1><button class="adminbtn" id="btnAdmin">Admin</button></div>
   <nav id="tabs">
     <button data-t="reg" class="on">Registrar viaje</button>
     <button data-t="rep">Repartidores</button>
@@ -150,7 +170,87 @@ ol.prio li:first-child{border-top:0}
   </div>
 </section>
 
+<!-- ADMIN -->
+<section id="adm">
+  <div class="card">
+    <h2>Modo Admin</h2>
+    <div class="mut">La sesión se cierra tras 10 minutos sin actividad.</div>
+    <button class="btn danger" id="aExit">Salir de Admin</button>
+  </div>
+
+  <div class="card">
+    <h2 id="aFormTitle">Registrar viaje (Admin)</h2>
+    <label for="aDriver">Driver</label>
+    <select id="aDriver"></select>
+    <div class="row">
+      <div><label for="aDate">Fecha</label><input id="aDate" type="date"></div>
+      <div><label for="aOrders">Pedidos entregados</label><input id="aOrders" type="number" inputmode="numeric" min="0" max="99" step="1" value="1"></div>
+    </div>
+    <label for="aZone">Destino o zona</label>
+    <input id="aZone" type="text" placeholder="Ej. Zona norte" maxlength="80">
+    <div class="row">
+      <div><label for="aOut">Km de ida</label><input id="aOut" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0"></div>
+      <div><label for="aBack">Km de regreso</label><input id="aBack" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0"></div>
+    </div>
+    <div class="row">
+      <div><label for="aKm">Km redondos (automático)</label><input id="aKm" type="text" readonly></div>
+      <div><label for="aType">Tipo de ruta</label>
+        <select id="aType">
+          <option value="auto">Automático</option>
+          <option value="cercano">Corta</option>
+          <option value="medio">Mediana</option>
+          <option value="lejano">Lejana</option>
+        </select></div>
+    </div>
+    <div class="row">
+      <div><label for="aDep">Hora de salida</label><input id="aDep" type="time"></div>
+      <div><label for="aRet">Hora de regreso</label><input id="aRet" type="time"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="aForced"> Viaje forzado</label>
+    <label for="aNote">Nota (opcional)</label>
+    <textarea id="aNote" rows="2" maxlength="200"></textarea>
+    <div class="err" id="aErr"></div>
+    <button class="btn" id="aSave">Guardar viaje</button>
+    <button class="btn sec" id="aCancel" style="display:none">Cancelar edición</button>
+  </div>
+
+  <div id="aCards"></div>
+
+  <div class="card"><h2>Prioridad para siguiente ruta lejana</h2><div id="aPrio"></div></div>
+  <div class="card"><h2>Tabla general</h2><div id="aTable"></div></div>
+
+  <div class="card">
+    <h2>Historial Admin</h2>
+    <div class="row">
+      <div><label for="aHDrv">Driver</label><select id="aHDrv"></select></div>
+      <div><label for="aHType">Tipo de ruta</label>
+        <select id="aHType"><option value="">Todas</option><option value="cercano">Corta</option><option value="medio">Mediana</option><option value="lejano">Lejana</option></select></div>
+    </div>
+    <label for="aHDate">Fecha (vacío = todas)</label>
+    <input id="aHDate" type="date">
+    <div id="aHis" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Datos Admin</h2>
+    <button class="btn sec" id="aCsv">Exportar CSV</button>
+    <button class="btn sec" id="aJson">Respaldar (JSON)</button>
+    <button class="btn sec" id="aImport">Restaurar respaldo (JSON)</button>
+    <button class="btn danger" id="aWipe">Borrar datos de la semana</button>
+  </div>
+</section>
+
 </main>
+
+<div id="modal" class="modal">
+  <div class="card">
+    <h2>Acceso Admin</h2>
+    <input id="passIn" type="password" inputmode="numeric" placeholder="Contraseña" autocomplete="off">
+    <div class="err" id="passErr">Contraseña incorrecta</div>
+    <button class="btn" id="passOk">Entrar</button>
+    <button class="btn sec" id="passCancel">Cancelar</button>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -158,6 +258,16 @@ ol.prio li:first-child{border-top:0}
 const KEY='repartidores_v1';
 let S=load();
 let editingId=null;
+const AKEY='repartidores_admin_v1';
+let A=loadA();
+function loadA(){
+  try{
+    const raw=localStorage.getItem(AKEY);
+    if(raw){const o=JSON.parse(raw);if(o&&o.byDriver&&typeof o.byDriver==='object'&&!Array.isArray(o.byDriver))return o;}
+  }catch(e){}
+  return {byDriver:{}};
+}
+function saveA(){try{localStorage.setItem(AKEY,JSON.stringify(A))}catch(e){alert('No se pudo guardar en este navegador.')}}
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function defaults(){
@@ -201,6 +311,7 @@ function prioSort(a,b){return a.km-b.km||a.far-b.far||a.farN-b.farN||a.forced-b.
 // ---------- Pestañas ----------
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>go(b.dataset.t));
 function go(t){
+  if(t==='adm'&&!adminOn){openModal();return}
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
   document.querySelectorAll('main section').forEach(s=>s.classList.toggle('on',s.id===t));
   window.scrollTo(0,0);renderAll();
@@ -325,6 +436,7 @@ function renderDrivers(){
     if(!confirm(`¿Eliminar a ${d.name}?${cnt?` Se borrarán también sus ${cnt} viajes del historial.`:''}`))return;
     S.drivers=S.drivers.filter(x=>x.id!==d.id);
     S.trips=S.trips.filter(t=>t.driverId!==d.id);
+    delete A.byDriver[d.id];saveA();
     save();renderAll();
   });
 }
@@ -404,7 +516,7 @@ $('btnCsv').onclick=()=>{
   });
   download('viajes_'+stamp()+'.csv','\uFEFF'+head.map(q).join(',')+'\n'+rows.join('\n'),'text/csv;charset=utf-8');
 };
-$('btnJson').onclick=()=>download('respaldo_repartidores_'+stamp()+'.json',JSON.stringify(S,null,2),'application/json');
+$('btnJson').onclick=()=>download('respaldo_repartidores_'+stamp()+'.json',JSON.stringify(Object.assign({},S,{admin:A.byDriver}),null,2),'application/json');
 $('btnImport').onclick=()=>$('fileImport').click();
 $('fileImport').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
@@ -415,6 +527,11 @@ $('fileImport').onchange=e=>{
       if(!o||!Array.isArray(o.drivers)||!Array.isArray(o.trips))throw 0;
       if(!confirm('Esto reemplazará los datos actuales con el respaldo. ¿Continuar?'))return;
       S={drivers:o.drivers,trips:o.trips,rate:typeof o.rate==='number'?o.rate:2.5};
+      if(o.admin&&typeof o.admin==='object'&&!Array.isArray(o.admin)){
+        Object.keys(o.admin).forEach(k=>{if(!Array.isArray(o.admin[k]))o.admin[k]=[]});
+        A={byDriver:o.admin};saveA();
+      }
+      aEditing=null;
       save();resetForm();renderAll();toast('Respaldo restaurado ✔');
     }catch(err){alert('El archivo no es un respaldo válido.')}
   };
@@ -428,9 +545,231 @@ $('btnWipe').onclick=()=>{
   S.trips=S.trips.filter(t=>t.ts<ws);save();renderAll();toast('Semana borrada');
 };
 
+// ---------- ADMIN ----------
+const ADMIN_PASS='1928';          // solo en memoria del código; nunca se guarda en localStorage
+const IDLE_MS=10*60*1000;
+const AL={cercano:'Corta',medio:'Mediana',lejano:'Lejana'};
+let adminOn=false,lastAct=0,aEditing=null;
+
+function openModal(){$('passIn').value='';$('passErr').style.display='none';$('modal').style.display='flex';setTimeout(()=>$('passIn').focus(),50)}
+function closeModal(){$('modal').style.display='none';$('passIn').value=''}
+function tryLogin(){
+  if($('passIn').value===ADMIN_PASS){
+    closeModal();adminOn=true;lastAct=Date.now();
+    $('btnAdmin').textContent='Admin ●';go('adm');
+  }else{$('passErr').style.display='block';$('passIn').value=''}
+}
+function logout(msg){
+  adminOn=false;aEditing=null;aResetForm();
+  ['aCards','aPrio','aTable','aHis'].forEach(id=>$(id).innerHTML='');
+  $('btnAdmin').textContent='Admin';
+  if($('adm').classList.contains('on'))go('reg');
+  if(msg)toast(msg);
+}
+function touchAct(){if(adminOn)lastAct=Date.now()}
+['pointerdown','keydown','touchstart','scroll','input'].forEach(ev=>document.addEventListener(ev,touchAct,{passive:true,capture:true}));
+function checkIdle(){if(adminOn&&Date.now()-lastAct>IDLE_MS)logout('Sesión Admin cerrada por inactividad')}
+setInterval(checkIdle,5000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkIdle()});
+
+$('btnAdmin').onclick=()=>{if(adminOn)go('adm');else openModal()};
+$('passOk').onclick=tryLogin;
+$('passCancel').onclick=closeModal;
+$('passIn').addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin()});
+$('aExit').onclick=()=>logout('Sesión Admin cerrada');
+
+function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function findA(id){
+  const ks=Object.keys(A.byDriver);
+  for(let i=0;i<ks.length;i++){const t=(A.byDriver[ks[i]]||[]).find(x=>x.id===id);if(t)return {t,did:ks[i]}}
+  return null;
+}
+function fillAdminSelects(){
+  const cur=$('aDriver').value,curH=$('aHDrv').value;
+  const opts=S.drivers.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
+  $('aDriver').innerHTML=opts||'<option value="">Sin drivers</option>';
+  if(S.drivers.some(d=>d.id===cur))$('aDriver').value=cur;
+  $('aHDrv').innerHTML='<option value="">Todos</option>'+opts;
+  if(S.drivers.some(d=>d.id===curH))$('aHDrv').value=curH;
+}
+function aUpdKm(){
+  const o=parseFloat($('aOut').value)||0,b=parseFloat($('aBack').value)||0,t=r1(o+b);
+  const ty=$('aType').value==='auto'?classify(t):$('aType').value;
+  $('aKm').value=t>0?`${fmt(t)} km · ${AL[ty]}`:'0 km';
+}
+['aOut','aBack','aType'].forEach(id=>{$(id).addEventListener('input',aUpdKm);$(id).addEventListener('change',aUpdKm)});
+function aResetForm(){
+  aEditing=null;
+  $('aDate').value=todayISO();$('aZone').value='';$('aOut').value='';$('aBack').value='';
+  $('aOrders').value=1;$('aType').value='auto';$('aForced').checked=false;
+  $('aDep').value=nowHM();$('aRet').value='';$('aNote').value='';
+  $('aFormTitle').textContent='Registrar viaje (Admin)';$('aSave').textContent='Guardar viaje';
+  $('aCancel').style.display='none';$('aErr').style.display='none';aUpdKm();
+}
+function aShowErr(m){const e=$('aErr');e.textContent=m;e.style.display='block'}
+
+$('aSave').onclick=()=>{
+  $('aErr').style.display='none';
+  const driverId=$('aDriver').value;
+  if(!S.drivers.some(d=>d.id===driverId))return aShowErr('Elige un driver.');
+  const date=$('aDate').value;
+  if(!date)return aShowErr('Elige la fecha del viaje.');
+  const orders=Number($('aOrders').value);
+  if(!Number.isInteger(orders)||orders<0||orders>99)return aShowErr('Pedidos entregados: escribe un número entero de 0 a 99.');
+  const kmOut=parseFloat($('aOut').value)||0,kmBack=parseFloat($('aBack').value)||0;
+  if(kmOut<0||kmBack<0)return aShowErr('Los kilómetros no pueden ser negativos.');
+  if(kmOut+kmBack<=0)return aShowErr('Los kilómetros no pueden ser 0. Captura ida y/o regreso.');
+  const dep=$('aDep').value;
+  const ts=new Date(date+'T'+(dep||'12:00')+':00').getTime();
+  if(isNaN(ts))return aShowErr('Fecha u hora no válida.');
+  const kmTotal=r1(kmOut+kmBack);
+  const sel=$('aType').value;
+  const type=sel==='auto'?classify(kmTotal):sel;
+  const data={driverId,date,ts,zone:$('aZone').value.trim(),kmOut,kmBack,kmTotal,orders,type,forced:$('aForced').checked,depart:dep,returnEta:$('aRet').value,note:$('aNote').value.trim()};
+  const was=!!aEditing;
+  let id=uid();
+  if(aEditing){
+    id=aEditing;
+    const f=findA(aEditing);
+    if(f)A.byDriver[f.did]=A.byDriver[f.did].filter(x=>x.id!==aEditing);
+  }
+  if(!A.byDriver[driverId])A.byDriver[driverId]=[];
+  A.byDriver[driverId].push(Object.assign({id},data));
+  saveA();aResetForm();
+  toast(was?'Viaje actualizado ✔':'Viaje guardado ✔');
+  renderAll();
+};
+$('aCancel').onclick=aResetForm;
+
+function aStats(){
+  const ws=weekStart(Date.now()),ds=dayStart(Date.now());
+  const we=new Date(ws);we.setDate(we.getDate()+7);const wEnd=we.getTime();
+  return S.drivers.map(d=>{
+    const s={d,km:0,dayKm:0,kmT:{cercano:0,medio:0,lejano:0},n:{cercano:0,medio:0,lejano:0},forced:0,orders:0,last:null};
+    (A.byDriver[d.id]||[]).forEach(t=>{
+      if(!s.last||t.ts>s.last.ts)s.last=t;
+      if(t.ts>=ws&&t.ts<wEnd){s.km+=t.kmTotal;s.orders+=t.orders;s.kmT[t.type]+=t.kmTotal;s.n[t.type]++;if(t.forced)s.forced++}
+      if(t.ts>=ds&&t.ts<ds+864e5)s.dayKm+=t.kmTotal;
+    });
+    s.far=s.kmT.lejano;s.farN=s.n.lejano;
+    return s;
+  });
+}
+function recs(st){
+  const sorted=st.slice().sort(prioSort);
+  const groups=[];
+  sorted.forEach(s=>{const g=groups[groups.length-1];if(g&&prioSort(g[0],s)===0)g.push(s);else groups.push([s])});
+  const out=new Map();
+  groups.forEach((g,i)=>{
+    let base;
+    if(i===0)base={t:'Siguiente ruta: LEJANA',c:'g'};
+    else if(i===groups.length-1)base={t:'Siguiente ruta: CORTA',c:'r'};
+    else base={t:'Siguiente ruta: MEDIANA',c:'y'};
+    g.forEach(s=>{
+      let r=base;
+      if(s.forced>=2)r={t:'Dar prioridad a ruta CORTA en el siguiente turno',c:'r',ov:1};
+      else if(s.far>100)r={t:'Priorizar ruta CORTA',c:'r',ov:1};
+      out.set(s.d.id,r);
+    });
+  });
+  return {sorted,groups,out};
+}
+const CLS={g:'tg',y:'ty',r:'tr'};
+
+function renderAdmin(){
+  if(!adminOn)return;
+  fillAdminSelects();
+  const st=aStats(),R=recs(st);
+  if(!st.length){$('aCards').innerHTML='<div class="card"><div class="empty">No hay drivers. Agrégalos en la pestaña Repartidores.</div></div>';$('aPrio').innerHTML='';$('aTable').innerHTML='';renderAdminHistory();return}
+  $('aCards').innerHTML=st.map(s=>{
+    const r=R.out.get(s.d.id),l=s.last;
+    const lastTxt=l?`${new Date(l.ts).toLocaleDateString('es-MX',{day:'numeric',month:'short'})}${l.depart?' '+esc(l.depart):''} · ${esc(l.zone||'Sin zona')} · ${fmt(l.kmTotal)} km (${AL[l.type]})`:'Sin viajes';
+    return `<div class="card"><h2>${esc(s.d.name)}</h2><div class="grid2">
+      <div class="stat"><span class="mut">Km semana</span><span class="num">${fmt(s.km)}</span></div>
+      <div class="stat"><span class="mut">Km hoy</span><span class="num">${fmt(s.dayKm)}</span></div>
+      <div class="stat"><span class="mut">Km cortas</span><span class="num">${fmt(s.kmT.cercano)}</span></div>
+      <div class="stat"><span class="mut">Km medianas</span><span class="num">${fmt(s.kmT.medio)}</span></div>
+      <div class="stat"><span class="mut">Km lejanas</span><span class="num">${fmt(s.kmT.lejano)}</span></div>
+      <div class="stat"><span class="mut">Viajes C / M / L</span><span class="num">${s.n.cercano} / ${s.n.medio} / ${s.n.lejano}</span></div>
+      <div class="stat"><span class="mut">Forzados</span><span class="num">${s.forced}</span></div>
+      <div class="stat"><span class="mut">Km por pedido</span><span class="num">${s.orders?fmt(s.km/s.orders):'—'}</span></div>
+      <div class="stat" style="grid-column:1/-1"><span class="mut">Último viaje</span>${lastTxt}</div>
+    </div><div class="rec ${r.c}">${r.t}</div></div>`;
+  }).join('');
+  $('aPrio').innerHTML=`<ol class="prio">${R.groups.map(g=>{
+    const flag=g.filter(s=>R.out.get(s.d.id).ov).map(s=>esc(s.d.name));
+    return `<li>${g.length>1?'<span class="mut">Empate: </span>':''}<b>${g.map(s=>esc(s.d.name)).join(' = ')}</b><br><span class="mut">${fmt(g[0].km)} km · lejanos ${fmt(g[0].far)} km (${g[0].farN}) · forzados ${g[0].forced}</span>${flag.length?`<br><span class="tr">⚠ ${flag.join(', ')}: ruta corta primero</span>`:''}</li>`;
+  }).join('')}</ol>`;
+  $('aTable').innerHTML=`<table class="tbl"><thead><tr><th>Driver</th><th>Km totales</th><th>Km lejanos</th><th>Viajes lejanos</th><th>Viajes forzados</th><th>Km/pedido</th><th>Recomendación</th></tr></thead><tbody>${R.sorted.map(s=>{
+    const r=R.out.get(s.d.id);
+    return `<tr><td data-l="Driver"><b>${esc(s.d.name)}</b></td><td data-l="Km totales">${fmt(s.km)}</td><td data-l="Km lejanos">${fmt(s.far)}</td><td data-l="Viajes lejanos">${s.farN}</td><td data-l="Viajes forzados">${s.forced}</td><td data-l="Km por pedido">${s.orders?fmt(s.km/s.orders):'—'}</td><td data-l="Recomendación" class="${CLS[r.c]}">${r.t}</td></tr>`;
+  }).join('')}</tbody></table>`;
+  renderAdminHistory();
+}
+
+function renderAdminHistory(){
+  if(!adminOn)return;
+  const dv=$('aHDrv').value,dt=$('aHDate').value,ty=$('aHType').value;
+  const list=[];
+  S.drivers.forEach(d=>(A.byDriver[d.id]||[]).forEach(t=>list.push(t)));
+  const f=list.filter(t=>(!dv||t.driverId===dv)&&(!dt||t.date===dt)&&(!ty||t.type===ty)).sort((a,b)=>b.ts-a.ts);
+  if(!f.length){$('aHis').innerHTML='<div class="empty">No hay viajes con estos filtros.</div>';return}
+  const km=f.reduce((a,t)=>a+t.kmTotal,0);
+  $('aHis').innerHTML=`<div class="mut" style="margin-bottom:8px">${f.length} viajes · ${fmt(km)} km</div>`+f.map(t=>{
+    const d=new Date(t.ts);
+    return `<div class="item"><div class="top"><div><b>${esc(drvName(t.driverId))}</b><br><span class="mut">${d.toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'})}${t.depart?' '+esc(t.depart):''}</span></div>
+      <div><span class="pill ${t.type==='lejano'?'lejano':''}">${AL[t.type]}</span>${t.forced?'<span class="pill forz">Forzado</span>':''}</div></div>
+      <div>${esc(t.zone||'Sin zona')}</div>
+      <div class="mut">ida ${fmt(t.kmOut)} + regreso ${fmt(t.kmBack)} = <b style="color:#fff">${fmt(t.kmTotal)} km</b> · ${t.orders} pedido(s)${t.orders?` · ${fmt(t.kmTotal/t.orders)} km/pedido`:''}${t.returnEta?` · regreso ${esc(t.returnEta)}`:''}</div>
+      ${t.note?`<div class="mut">📝 ${esc(t.note)}</div>`:''}
+      <div class="acts"><button class="btn sm sec" data-aedit="${t.id}">Editar</button><button class="btn sm danger" data-arm="${t.id}">Eliminar</button></div></div>`;
+  }).join('');
+  document.querySelectorAll('[data-aedit]').forEach(b=>b.onclick=()=>aEditTrip(b.dataset.aedit));
+  document.querySelectorAll('[data-arm]').forEach(b=>b.onclick=()=>{
+    if(!confirm('¿Eliminar este viaje? Se recalcularán totales y recomendaciones.'))return;
+    const f2=findA(b.dataset.arm);
+    if(f2){A.byDriver[f2.did]=A.byDriver[f2.did].filter(x=>x.id!==b.dataset.arm);saveA()}
+    renderAll();
+  });
+}
+['aHDrv','aHDate','aHType'].forEach(id=>$(id).onchange=renderAdminHistory);
+
+function aEditTrip(id){
+  const f=findA(id);if(!f)return;const t=f.t;
+  aEditing=id;
+  $('aDriver').value=t.driverId;$('aDate').value=t.date;$('aZone').value=t.zone;
+  $('aOrders').value=t.orders;$('aType').value=t.type;$('aOut').value=t.kmOut;$('aBack').value=t.kmBack;
+  $('aDep').value=t.depart||'';$('aRet').value=t.returnEta||'';
+  $('aForced').checked=!!t.forced;$('aNote').value=t.note||'';
+  $('aFormTitle').textContent='Editar viaje (Admin)';$('aSave').textContent='Guardar cambios';
+  $('aCancel').style.display='block';$('aErr').style.display='none';aUpdKm();
+  $('aFormTitle').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+$('aCsv').onclick=()=>{
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const head=['Fecha','Driver','Destino/zona','Km ida','Km regreso','Km redondos','Pedidos entregados','Tipo de ruta','Forzado','Salida','Regreso','Nota'];
+  const rows=[];
+  S.drivers.forEach(d=>(A.byDriver[d.id]||[]).forEach(t=>rows.push(t)));
+  rows.sort((a,b)=>a.ts-b.ts);
+  const body=rows.map(t=>[t.date,drvName(t.driverId),t.zone,t.kmOut,t.kmBack,t.kmTotal,t.orders,AL[t.type],t.forced?'Sí':'No',t.depart,t.returnEta,t.note].map(q).join(','));
+  download('admin_viajes_'+stamp()+'.csv','\uFEFF'+head.map(q).join(',')+'\n'+body.join('\n'),'text/csv;charset=utf-8');
+};
+$('aJson').onclick=()=>$('btnJson').onclick();
+$('aImport').onclick=()=>$('fileImport').click();
+$('aWipe').onclick=()=>{
+  const ws=weekStart(Date.now());
+  let n=0;S.drivers.forEach(d=>(A.byDriver[d.id]||[]).forEach(t=>{if(t.ts>=ws)n++}));
+  if(!n)return alert('No hay viajes Admin esta semana.');
+  if(!confirm(`¿Borrar los ${n} viajes Admin de esta semana? No se puede deshacer.`))return;
+  Object.keys(A.byDriver).forEach(k=>{A.byDriver[k]=(A.byDriver[k]||[]).filter(t=>t.ts<ws)});
+  saveA();renderAll();toast('Semana Admin borrada');
+};
+aResetForm();
+
 // ---------- Render general ----------
 function renderAll(){
-  fillDriverSelects();renderDrivers();renderHistory();renderSummary();
+  fillDriverSelects();renderDrivers();renderHistory();renderSummary();renderAdmin();
   $('rate').value=S.rate;
 }
 resetForm();renderAll();
