@@ -294,7 +294,7 @@ const AL={cercano:'Corta',medio:'Mediana',lejano:'Lejana'};
 
 function weekStart(d){const x=new Date(d);x.setHours(0,0,0,0);const wd=(x.getDay()+6)%7;x.setDate(x.getDate()-wd);return x.getTime()}
 function dayStart(d){const x=new Date(d);x.setHours(0,0,0,0);return x.getTime()}
-function classify(km){return km<=15?'cercano':(km<=35?'medio':'lejano')}
+function classify(km){return km<=11?'cercano':(km<=20?'medio':'lejano')}
 function nowHM(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
 function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function drvName(id){const d=S.drivers.find(x=>x.id===id);return d?d.name:'(eliminado)'}
@@ -613,22 +613,13 @@ function nextSuggest(){
   if(!st.length){box.innerHTML='<div class="empty">No hay drivers. Agrégalos abajo, en "Drivers".</div>';return}
   const R=recs(st),asc=R.sorted,ov=s=>!!R.out.get(s.d.id).ov;
   const type=classify(km);
-  let pool,order,why;
-  if(type==='lejano'){
-    pool=asc.filter(s=>!ov(s));if(!pool.length)pool=asc.slice();
-    order=pool.concat(asc.filter(s=>pool.indexOf(s)<0));
-    why='Salida LEJANA (más de 35 km): va quien lleva menos kilómetros en la semana.';
-  }else if(type==='cercano'){
-    const fl=asc.filter(ov);
-    pool=(fl.length?fl:asc.slice()).reverse();
-    order=pool.concat(asc.slice().reverse().filter(s=>pool.indexOf(s)<0));
-    why=fl.length?'Salida CORTA (hasta 15 km): se da prioridad a quien ya tiene muchos km lejanos o 2+ viajes forzados.':'Salida CORTA (hasta 15 km): va quien lleva más kilómetros en la semana.';
-  }else{
-    const mid=asc.filter(s=>R.out.get(s.d.id).c==='y'&&!ov(s));
-    pool=mid.length?mid:asc.filter(s=>!ov(s));if(!pool.length)pool=asc.slice();
-    order=pool.concat(asc.filter(s=>pool.indexOf(s)<0));
-    why='Salida MEDIANA (15.1 a 35 km): va un driver con kilometraje intermedio.';
-  }
+  // Siempre va quien tiene menos km en la semana (el de "siguiente ruta LEJANA"); si no, el MEDIANA, y así.
+  // Quien tiene "prioridad ruta CORTA" queda al final, salvo que la salida sea corta.
+  const elig=type==='cercano'?asc.slice():asc.filter(s=>!ov(s));
+  const rest0=asc.filter(s=>elig.indexOf(s)<0);
+  const pool=elig.length?elig:asc.slice();
+  const order=elig.length?elig.concat(rest0):asc.slice();
+  const why='Se asigna a quien lleva menos kilómetros en la semana.'+(type!=='cercano'&&elig.length&&rest0.length?' Se dejó al final a quien tiene prioridad de ruta corta.':'');
   const pick=pool.filter(s=>prioSort(s,pool[0])===0);
   const others=order.filter(s=>pick.indexOf(s)<0);
   let html=`<div class="mut" style="margin-top:12px">Salida de <b style="color:#fff">${fmt(km)} km</b> · ruta <b style="color:#fff">${AL[type]}</b></div>`;
