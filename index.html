@@ -3,30 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Control de Repartidores</title>
+<title>Control de Repartos</title>
 <style>
-:root{--bg:#0e0e0f;--card:#1a1a1c;--card2:#232326;--line:#2e2e33;--red:#e11d2e;--red2:#ff4757;--txt:#f4f4f5;--mut:#a1a1aa;--ok:#22c55e}
+:root{--bg:#0e0e0f;--card:#1a1a1c;--card2:#232326;--line:#2e2e33;--red:#e11d2e;--red2:#ff4757;--txt:#f4f4f5;--mut:#a1a1aa}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:17px;line-height:1.4;overflow-x:hidden}
 header{padding:16px 16px 8px;position:sticky;top:0;background:var(--bg);z-index:5}
-h1{margin:0 0 10px;font-size:22px}
+h1{margin:0;font-size:22px}
 h1 span{color:var(--red)}
-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-nav button{padding:12px 2px;font-size:13px;font-weight:700;background:var(--card);color:var(--mut);border:1px solid var(--line);border-radius:12px;cursor:pointer}
+.hrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.adminbtn{background:none;border:1px solid var(--line);color:var(--mut);font-size:12px;padding:6px 12px;border-radius:99px;cursor:pointer;opacity:.75}
+nav{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+nav button{padding:12px 2px;font-size:14px;font-weight:700;background:var(--card);color:var(--mut);border:1px solid var(--line);border-radius:12px;cursor:pointer}
 nav button.on{background:var(--red);color:#fff;border-color:var(--red)}
 main{padding:8px 16px 90px;max-width:720px;margin:0 auto}
 section{display:none}section.on{display:block}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 4px 14px rgba(0,0,0,.35)}
 .card h2{margin:0 0 12px;font-size:19px}
 label{display:block;font-size:14px;color:var(--mut);margin:12px 0 4px}
+.hint{font-size:13px;color:var(--mut);margin-top:4px}
 input,select,textarea{width:100%;padding:13px;font-size:17px;color:var(--txt);background:var(--card2);border:1px solid var(--line);border-radius:12px;font-family:inherit}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--red);border-color:var(--red)}
+input[readonly]{opacity:.8}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .chk{display:flex;align-items:center;gap:12px;margin-top:14px;padding:13px;background:var(--card2);border-radius:12px;border:1px solid var(--line);color:var(--txt);font-size:17px}
 .chk input{width:26px;height:26px;accent-color:var(--red);margin:0}
 button.btn{width:100%;padding:16px;font-size:18px;font-weight:800;color:#fff;background:var(--red);border:0;border-radius:14px;cursor:pointer;margin-top:14px}
 button.btn:active{background:var(--red2)}
-button.big{padding:22px 16px;font-size:20px}
 button.sec{background:var(--card2);border:1px solid var(--line);color:var(--txt)}
 button.sm{width:auto;padding:10px 14px;font-size:15px;margin:0;border-radius:10px}
 .danger{background:#5b0f17}
@@ -48,14 +51,13 @@ button.sm{width:auto;padding:10px 14px;font-size:15px;margin:0;border-radius:10p
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat{background:var(--card2);border-radius:12px;padding:12px}
 .stat .mut{display:block}
+.dayh{margin:16px 0 4px;font-weight:800;color:var(--red2);font-size:17px}
+.dayh span{color:var(--mut);font-weight:500;font-size:14px}
 ol.prio{padding-left:24px;margin:0}
 ol.prio li{padding:8px 0;border-top:1px solid var(--line)}
 ol.prio li:first-child{border-top:0}
 .empty{color:var(--mut);text-align:center;padding:16px}
 .tie button{margin-top:8px}
-.hrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.hrow h1{margin:0}
-.adminbtn{background:none;border:1px solid var(--line);color:var(--mut);font-size:12px;padding:6px 12px;border-radius:99px;cursor:pointer;opacity:.75}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:50;align-items:center;justify-content:center;padding:16px}
 .modal .card{width:100%;max-width:360px;margin:0}
 .rec{margin-top:12px;padding:14px;border-radius:12px;font-weight:800;font-size:18px;text-align:center;border:1px solid}
@@ -66,7 +68,6 @@ ol.prio li:first-child{border-top:0}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}
 .tbl th{text-align:left;color:var(--mut);font-weight:600;padding:8px 6px;border-bottom:1px solid var(--line)}
 .tbl td{padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:top}
-input[readonly]{opacity:.8}
 @media(max-width:640px){
   .tbl thead{display:none}
   .tbl tr{display:block;padding:10px 0;border-bottom:1px solid var(--line)}
@@ -77,75 +78,60 @@ input[readonly]{opacity:.8}
 </head>
 <body>
 <header>
-  <div class="hrow"><h1>🛵 Control de <span>Repartidores</span></h1><button class="adminbtn" id="btnAdmin">Admin</button></div>
+  <div class="hrow"><h1>🛵 Control de <span>Repartos</span></h1><button class="adminbtn" id="btnAdmin">Admin</button></div>
   <nav id="tabs">
-    <button data-t="reg" class="on">Registrar viaje</button>
-    <button data-t="rep">Repartidores</button>
+    <button data-t="reg" class="on">Registrar salida</button>
     <button data-t="his">Historial</button>
     <button data-t="res">Resumen</button>
   </nav>
 </header>
 <main>
 
-<!-- REGISTRAR -->
+<!-- REGISTRAR SALIDA -->
 <section id="reg" class="on">
-  <button class="btn big" id="btnSug">¿Quién debe ir al siguiente viaje lejano?</button>
-  <div id="sugBox"></div>
-
   <div class="card">
-    <h2 id="formTitle">Registrar viaje</h2>
-    <label for="fDriver">Repartidor</label>
-    <select id="fDriver"></select>
-    <label for="fZone">Zona o dirección breve</label>
+    <h2 id="formTitle">Registrar salida</h2>
+    <div class="hint">Una salida = cada vez que sales de la tienda a entregar.</div>
+    <label for="fZone">Zona o destino (opcional)</label>
     <input id="fZone" type="text" placeholder="Ej. Col. Centro" maxlength="80">
     <div class="row">
       <div><label for="fOrders">Pedidos (1 a 10)</label><input id="fOrders" type="number" inputmode="numeric" min="1" max="10" step="1" value="1"></div>
       <div><label for="fType">Tipo de viaje</label>
         <select id="fType">
           <option value="auto">Automático</option>
-          <option value="cercano">Cercano</option>
+          <option value="cercano">Corto</option>
           <option value="medio">Medio</option>
-          <option value="lejano">Lejano</option>
+          <option value="lejano">Largo</option>
         </select></div>
     </div>
-    <div class="row">
-      <div><label for="fOut">Km de ida</label><input id="fOut" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0"></div>
-      <div><label for="fBack">Km de regreso</label><input id="fBack" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0"></div>
-    </div>
+    <label for="fOut">1) Km de toda la ruta</label>
+    <input id="fOut" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0">
+    <div class="hint">De la tienda hasta el último pedido, sumando todos. Si es 1 pedido, los km para llegar a él.</div>
+    <label for="fBack">2) Km de regreso a la tienda</label>
+    <input id="fBack" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0">
+    <div class="hint">Solo desde el último pedido entregado hasta la tienda.</div>
     <div class="row">
       <div><label for="fDep">Hora de salida</label><input id="fDep" type="time"></div>
-      <div><label for="fRet">Regreso estimado</label><input id="fRet" type="time"></div>
+      <div><label for="fRet">Hora de regreso</label><input id="fRet" type="time"></div>
     </div>
     <label class="chk"><input type="checkbox" id="fForced"> Viaje forzado (no había otra opción)</label>
     <label for="fNote">Nota (opcional)</label>
     <textarea id="fNote" rows="2" maxlength="200"></textarea>
     <div class="prev" id="prev"></div>
     <div class="err" id="formErr"></div>
-    <button class="btn" id="btnSave">Guardar viaje</button>
+    <button class="btn" id="btnSave">Guardar salida</button>
     <button class="btn sec" id="btnCancel" style="display:none">Cancelar edición</button>
   </div>
-</section>
-
-<!-- REPARTIDORES -->
-<section id="rep">
-  <div class="card">
-    <h2>Agregar repartidor</h2>
-    <input id="newName" type="text" placeholder="Nombre" maxlength="40">
-    <button class="btn" id="btnAddDrv">Agregar</button>
-  </div>
-  <div id="drvList"></div>
 </section>
 
 <!-- HISTORIAL -->
 <section id="his">
   <div class="card">
     <h2>Filtros</h2>
-    <label for="hPer">Periodo</label>
-    <select id="hPer"><option value="week">Esta semana</option><option value="today">Hoy</option></select>
     <div class="row">
-      <div><label for="hDrv">Repartidor</label><select id="hDrv"></select></div>
+      <div><label for="hPer">Periodo</label><select id="hPer"><option value="week">Esta semana</option><option value="today">Hoy</option></select></div>
       <div><label for="hType">Tipo</label>
-        <select id="hType"><option value="">Todos</option><option value="cercano">Cercano</option><option value="medio">Medio</option><option value="lejano">Lejano</option></select></div>
+        <select id="hType"><option value="">Todos</option><option value="cercano">Corto</option><option value="medio">Medio</option><option value="lejano">Largo</option></select></div>
     </div>
   </div>
   <div class="card" id="hisList"></div>
@@ -153,13 +139,12 @@ input[readonly]{opacity:.8}
 
 <!-- RESUMEN -->
 <section id="res">
+  <div id="sumBox"></div>
   <div class="card">
     <h2>Gasolina</h2>
     <label for="rate">Tarifa por kilómetro ($)</label>
     <input id="rate" type="number" inputmode="decimal" min="0" step="0.1">
   </div>
-  <div id="teamBox"></div>
-  <div id="sumList"></div>
   <div class="card">
     <h2>Datos</h2>
     <button class="btn sec" id="btnCsv">Exportar CSV</button>
@@ -178,8 +163,16 @@ input[readonly]{opacity:.8}
     <button class="btn danger" id="aExit">Salir de Admin</button>
   </div>
 
+  <div class="card sug">
+    <h2>Siguiente salida</h2>
+    <label for="nKm">Km redondos de la salida</label>
+    <input id="nKm" type="number" inputmode="decimal" min="0" step="0.1" placeholder="Ej. 17">
+    <button class="btn" id="nGo">¿Qué driver debe llevarla?</button>
+    <div id="nOut"></div>
+  </div>
+
   <div class="card">
-    <h2 id="aFormTitle">Registrar viaje (Admin)</h2>
+    <h2 id="aFormTitle">Registrar salida (Admin)</h2>
     <label for="aDriver">Driver</label>
     <select id="aDriver"></select>
     <div class="row">
@@ -188,10 +181,12 @@ input[readonly]{opacity:.8}
     </div>
     <label for="aZone">Destino o zona</label>
     <input id="aZone" type="text" placeholder="Ej. Zona norte" maxlength="80">
-    <div class="row">
-      <div><label for="aOut">Km de ida</label><input id="aOut" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0"></div>
-      <div><label for="aBack">Km de regreso</label><input id="aBack" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0"></div>
-    </div>
+    <label for="aOut">1) Km de toda la ruta</label>
+    <input id="aOut" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0">
+    <div class="hint">Todos los pedidos juntos. Ej.: 3 pedidos = 25 km entre los 3. Con 1 pedido, los km para llegar a él.</div>
+    <label for="aBack">2) Km de regreso a la tienda</label>
+    <input id="aBack" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0">
+    <div class="hint">Solo desde el último pedido entregado hasta la tienda.</div>
     <div class="row">
       <div><label for="aKm">Km redondos (automático)</label><input id="aKm" type="text" readonly></div>
       <div><label for="aType">Tipo de ruta</label>
@@ -210,7 +205,7 @@ input[readonly]{opacity:.8}
     <label for="aNote">Nota (opcional)</label>
     <textarea id="aNote" rows="2" maxlength="200"></textarea>
     <div class="err" id="aErr"></div>
-    <button class="btn" id="aSave">Guardar viaje</button>
+    <button class="btn" id="aSave">Guardar salida</button>
     <button class="btn sec" id="aCancel" style="display:none">Cancelar edición</button>
   </div>
 
@@ -229,6 +224,14 @@ input[readonly]{opacity:.8}
     <label for="aHDate">Fecha (vacío = todas)</label>
     <input id="aHDate" type="date">
     <div id="aHis" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Drivers</h2>
+    <div id="aDrvList"></div>
+    <label for="aNewDrv">Agregar driver</label>
+    <input id="aNewDrv" type="text" placeholder="Nombre" maxlength="40">
+    <button class="btn sec" id="aAddDrv">Agregar</button>
   </div>
 
   <div class="card">
@@ -256,22 +259,14 @@ input[readonly]{opacity:.8}
 (function(){
 'use strict';
 const KEY='repartidores_v1';
-let S=load();
-let editingId=null;
 const AKEY='repartidores_admin_v1';
+let S=load();
 let A=loadA();
-function loadA(){
-  try{
-    const raw=localStorage.getItem(AKEY);
-    if(raw){const o=JSON.parse(raw);if(o&&o.byDriver&&typeof o.byDriver==='object'&&!Array.isArray(o.byDriver))return o;}
-  }catch(e){}
-  return {byDriver:{}};
-}
-function saveA(){try{localStorage.setItem(AKEY,JSON.stringify(A))}catch(e){alert('No se pudo guardar en este navegador.')}}
+let editingId=null;
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function defaults(){
-  return {drivers:['Repartidor 1','Repartidor 2','Repartidor 3','Repartidor 4'].map(n=>({id:uid(),name:n})),trips:[],rate:2.5};
+  return {drivers:['Driver 1','Driver 2','Driver 3','Driver 4'].map(n=>({id:uid(),name:n})),trips:[],rate:2.5};
 }
 function load(){
   try{
@@ -280,33 +275,34 @@ function load(){
   }catch(e){}
   return defaults();
 }
+function loadA(){
+  try{
+    const raw=localStorage.getItem(AKEY);
+    if(raw){const o=JSON.parse(raw);if(o&&o.byDriver&&typeof o.byDriver==='object'&&!Array.isArray(o.byDriver))return o;}
+  }catch(e){}
+  return {byDriver:{}};
+}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){alert('No se pudo guardar en este navegador.')}}
+function saveA(){try{localStorage.setItem(AKEY,JSON.stringify(A))}catch(e){alert('No se pudo guardar en este navegador.')}}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const r1=n=>Math.round(n*10)/10;
 const fmt=n=>r1(n).toLocaleString('es-MX',{maximumFractionDigits:1});
 const money=n=>'$'+n.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
-const TL={cercano:'Cercano',medio:'Medio',lejano:'Lejano'};
+const TL={cercano:'Corto',medio:'Medio',lejano:'Largo'};
+const AL={cercano:'Corta',medio:'Mediana',lejano:'Lejana'};
 
 function weekStart(d){const x=new Date(d);x.setHours(0,0,0,0);const wd=(x.getDay()+6)%7;x.setDate(x.getDate()-wd);return x.getTime()}
 function dayStart(d){const x=new Date(d);x.setHours(0,0,0,0);return x.getTime()}
-function weekTrips(){const ws=weekStart(Date.now());return S.trips.filter(t=>t.ts>=ws)}
 function classify(km){return km<=15?'cercano':(km<=35?'medio':'lejano')}
+function nowHM(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function drvName(id){const d=S.drivers.find(x=>x.id===id);return d?d.name:'(eliminado)'}
-
-// Estadísticas por repartidor (derivadas del historial semanal: eliminar/editar siempre cuadra)
-function stats(){
-  const m={};
-  S.drivers.forEach(d=>m[d.id]={d,km:0,far:0,farN:0,forced:0,orders:0,n:{cercano:0,medio:0,lejano:0}});
-  weekTrips().forEach(t=>{
-    const s=m[t.driverId];if(!s)return;
-    s.km+=t.kmTotal;s.orders+=t.orders;s.n[t.type]++;
-    if(t.type==='lejano'){s.far+=t.kmTotal;s.farN++}
-    if(t.forced)s.forced++;
-  });
-  return Object.values(m);
+function toast(m){
+  const t=document.createElement('div');t.textContent=m;
+  t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#e11d2e;color:#fff;padding:14px 22px;border-radius:99px;font-weight:700;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.5)';
+  document.body.appendChild(t);setTimeout(()=>t.remove(),1800);
 }
-function prioSort(a,b){return a.km-b.km||a.far-b.far||a.farN-b.farN||a.forced-b.forced}
 
 // ---------- Pestañas ----------
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>go(b.dataset.t));
@@ -317,22 +313,15 @@ function go(t){
   window.scrollTo(0,0);renderAll();
 }
 
-// ---------- Formulario ----------
-function fillDriverSelects(){
-  const cur=$('fDriver').value,curH=$('hDrv').value;
-  const opts=S.drivers.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
-  $('fDriver').innerHTML=opts||'<option value="">Sin repartidores</option>';
-  if(S.drivers.some(d=>d.id===cur))$('fDriver').value=cur;
-  $('hDrv').innerHTML='<option value="">Todos</option>'+opts;
-  if(S.drivers.some(d=>d.id===curH))$('hDrv').value=curH;
-}
-function nowHM(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+/* =====================================================
+   PÁGINA PRINCIPAL (un solo espacio, sin drivers)
+   ===================================================== */
 function resetForm(){
   editingId=null;
   $('fZone').value='';$('fOrders').value=1;$('fType').value='auto';
   $('fOut').value='';$('fBack').value='';$('fDep').value=nowHM();$('fRet').value='';
   $('fForced').checked=false;$('fNote').value='';
-  $('formTitle').textContent='Registrar viaje';$('btnSave').textContent='Guardar viaje';
+  $('formTitle').textContent='Registrar salida';$('btnSave').textContent='Guardar salida';
   $('btnCancel').style.display='none';$('formErr').style.display='none';updPrev();
 }
 function updPrev(){
@@ -342,165 +331,102 @@ function updPrev(){
   $('prev').innerHTML=tot>0?`Km redondos: <b>${fmt(tot)}</b> · Km por pedido: <b>${n>0?fmt(tot/n):'—'}</b> · Tipo: <b>${TL[type]}</b>`:'';
 }
 ['fOut','fBack','fOrders','fType'].forEach(id=>{$(id).addEventListener('input',updPrev);$(id).addEventListener('change',updPrev)});
-
 function showErr(m){const e=$('formErr');e.textContent=m;e.style.display='block'}
 
 $('btnSave').onclick=()=>{
   $('formErr').style.display='none';
-  const driverId=$('fDriver').value;
-  if(!driverId||!S.drivers.some(d=>d.id===driverId))return showErr('Elige un repartidor.');
   const orders=Number($('fOrders').value);
   if(!Number.isInteger(orders)||orders<1)return showErr('El número de pedidos no puede ser 0. Debe ser de 1 a 10.');
-  if(orders>10)return showErr('Un viaje puede tener máximo 10 pedidos.');
+  if(orders>10)return showErr('Una salida puede tener máximo 10 pedidos.');
   const kmOut=parseFloat($('fOut').value)||0,kmBack=parseFloat($('fBack').value)||0;
   if(kmOut<0||kmBack<0)return showErr('Los kilómetros no pueden ser negativos.');
-  if(kmOut+kmBack<=0)return showErr('Los kilómetros no pueden ser 0. Captura ida y/o regreso.');
+  if(kmOut+kmBack<=0)return showErr('Los kilómetros no pueden ser 0. Captura la ruta y/o el regreso.');
   const kmTotal=r1(kmOut+kmBack);
   const sel=$('fType').value;
   const type=sel==='auto'?classify(kmTotal):sel;
-  const data={driverId,zone:$('fZone').value.trim(),orders,kmOut,kmBack,kmTotal,kmPerOrder:kmTotal/orders,type,forced:$('fForced').checked,depart:$('fDep').value,returnEta:$('fRet').value,note:$('fNote').value.trim()};
+  const data={driverId:null,zone:$('fZone').value.trim(),orders,kmOut,kmBack,kmTotal,kmPerOrder:kmTotal/orders,type,forced:$('fForced').checked,depart:$('fDep').value,returnEta:$('fRet').value,note:$('fNote').value.trim()};
+  const wasEdit=!!editingId;
   if(editingId){
     const t=S.trips.find(x=>x.id===editingId);
     if(t)Object.assign(t,data);
   }else{
     S.trips.push(Object.assign({id:uid(),ts:Date.now()},data));
   }
-  save();
-  const wasEdit=!!editingId;
-  resetForm();$('sugBox').innerHTML='';
-  toast(wasEdit?'Viaje actualizado ✔':'Viaje guardado ✔');
+  save();resetForm();
+  toast(wasEdit?'Salida actualizada ✔':'Salida guardada ✔');
   renderAll();
 };
 $('btnCancel').onclick=resetForm;
 
-function toast(m){
-  const t=document.createElement('div');t.textContent=m;
-  t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#e11d2e;color:#fff;padding:14px 22px;border-radius:99px;font-weight:700;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.5)';
-  document.body.appendChild(t);setTimeout(()=>t.remove(),1800);
+// ---------- Historial por salidas ----------
+function dayLabel(k){
+  const t=dayStart(Date.now());
+  if(k===t)return 'Hoy';
+  if(k===dayStart(t-12*36e5))return 'Ayer';
+  return new Date(k).toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
 }
-
-// ---------- Sugerencia ----------
-function renderPrio(list){
-  return `<ol class="prio">${list.map(s=>`<li><b>${esc(s.d.name)}</b><br><span class="mut">Semana: ${fmt(s.km)} km · Lejanos: ${fmt(s.far)} km (${s.farN} viajes) · Forzados: ${s.forced}</span></li>`).join('')}</ol>`;
-}
-$('btnSug').onclick=()=>{
-  const list=stats().sort(prioSort);
-  const box=$('sugBox');
-  if(!list.length){box.innerHTML='<div class="card"><div class="empty">Agrega repartidores primero.</div></div>';return}
-  const top=list[0];
-  const tied=list.filter(s=>prioSort(s,top)===0);
-  let html='<div class="card sug">';
-  if(tied.length===1){
-    html+=`<div class="mut">Debe ir:</div><div class="name">${esc(top.d.name)}</div>
-    <div class="mut">${fmt(top.km)} km en la semana · ${fmt(top.far)} km en lejanos</div>`;
-  }else{
-    html+=`<div class="mut">Empate total. Elige quién va:</div><div class="tie">${tied.map(s=>`<button class="btn sm" style="width:100%" data-pick="${s.d.id}">${esc(s.d.name)}</button>`).join('')}</div>`;
-  }
-  html+=`<h2 style="margin-top:16px">Prioridad para viaje lejano</h2>${renderPrio(list)}</div>`;
-  box.innerHTML=html;
-  box.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
-    $('fDriver').value=b.dataset.pick;$('fType').value='lejano';updPrev();
-    toast('Seleccionado: '+drvName(b.dataset.pick));
-    $('fZone').focus();
-  });
-};
-
-// ---------- Repartidores ----------
-$('btnAddDrv').onclick=()=>{
-  const n=$('newName').value.trim();
-  if(!n)return alert('Escribe un nombre.');
-  S.drivers.push({id:uid(),name:n});$('newName').value='';save();renderAll();
-};
-function renderDrivers(){
-  const st=stats();
-  if(!st.length){$('drvList').innerHTML='<div class="card"><div class="empty">No hay repartidores.</div></div>';return}
-  $('drvList').innerHTML=st.map(s=>`<div class="card">
-    <input data-name="${s.d.id}" value="${esc(s.d.name)}" maxlength="40" aria-label="Nombre">
-    <div class="grid2" style="margin-top:12px">
-      <div class="stat"><span class="mut">Km semana</span><span class="num">${fmt(s.km)}</span></div>
-      <div class="stat"><span class="mut">Km lejanos</span><span class="num">${fmt(s.far)}</span></div>
-      <div class="stat"><span class="mut">Viajes lejanos</span><span class="num">${s.farN}</span></div>
-      <div class="stat"><span class="mut">Viajes forzados</span><span class="num">${s.forced}</span></div>
-    </div>
-    ${s.far>100?'<div class="warn">⚠ Más de 100 km en viajes lejanos esta semana</div>':''}
-    <div class="acts"><button class="btn sm danger" data-del="${s.d.id}">Eliminar</button></div>
-  </div>`).join('');
-  document.querySelectorAll('[data-name]').forEach(i=>i.onchange=()=>{
-    const d=S.drivers.find(x=>x.id===i.dataset.name);
-    const v=i.value.trim();
-    if(d&&v){d.name=v;save();fillDriverSelects()}else if(d){i.value=d.name}
-  });
-  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
-    const d=S.drivers.find(x=>x.id===b.dataset.del);if(!d)return;
-    const cnt=S.trips.filter(t=>t.driverId===d.id).length;
-    if(!confirm(`¿Eliminar a ${d.name}?${cnt?` Se borrarán también sus ${cnt} viajes del historial.`:''}`))return;
-    S.drivers=S.drivers.filter(x=>x.id!==d.id);
-    S.trips=S.trips.filter(t=>t.driverId!==d.id);
-    delete A.byDriver[d.id];saveA();
-    save();renderAll();
-  });
-}
-
-// ---------- Historial ----------
 function renderHistory(){
-  const per=$('hPer').value,dv=$('hDrv').value,ty=$('hType').value;
+  const per=$('hPer').value,ty=$('hType').value;
   const from=per==='today'?dayStart(Date.now()):weekStart(Date.now());
-  const list=S.trips.filter(t=>t.ts>=from&&(!dv||t.driverId===dv)&&(!ty||t.type===ty)).sort((a,b)=>b.ts-a.ts);
-  if(!list.length){$('hisList').innerHTML='<div class="empty">No hay viajes con estos filtros.</div>';return}
-  const km=list.reduce((a,t)=>a+t.kmTotal,0),od=list.reduce((a,t)=>a+t.orders,0);
-  $('hisList').innerHTML=`<div class="mut" style="margin-bottom:8px">${list.length} viajes · ${fmt(km)} km · ${od?fmt(km/od):0} km/pedido</div>`+list.map(t=>{
-    const d=new Date(t.ts);
-    return `<div class="item"><div class="top"><div><b>${esc(drvName(t.driverId))}</b><br><span class="mut">${d.toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'})} ${d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}</span></div>
+  const all=S.trips.filter(t=>t.ts>=from).sort((a,b)=>a.ts-b.ts);
+  const days={};
+  all.forEach(t=>{const k=dayStart(t.ts);(days[k]=days[k]||[]).push(t)});
+  const keys=Object.keys(days).map(Number).sort((a,b)=>b-a);
+  let html='',any=false;
+  keys.forEach(k=>{
+    const shown=days[k].map((t,i)=>({t,n:i+1})).filter(x=>!ty||x.t.type===ty).reverse();
+    if(!shown.length)return;
+    any=true;
+    const km=shown.reduce((a,x)=>a+x.t.kmTotal,0),od=shown.reduce((a,x)=>a+x.t.orders,0);
+    html+=`<div class="dayh">${esc(dayLabel(k))} <span>· ${shown.length} salida(s) · ${fmt(km)} km · ${od} pedidos</span></div>`;
+    html+=shown.map(({t,n})=>`<div class="item"><div class="top"><div><b>Viaje ${n}</b><br><span class="mut">${t.depart?'Sale '+esc(t.depart):new Date(t.ts).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}${t.returnEta?' · regresa '+esc(t.returnEta):''}</span></div>
       <div><span class="pill ${t.type==='lejano'?'lejano':''}">${TL[t.type]}</span>${t.forced?'<span class="pill forz">Forzado</span>':''}</div></div>
-      <div>${esc(t.zone||'Sin zona')}</div>
-      <div class="mut">${t.orders} pedido(s) · ida ${fmt(t.kmOut)} + regreso ${fmt(t.kmBack)} = <b style="color:#fff">${fmt(t.kmTotal)} km</b> · ${fmt(t.kmPerOrder)} km/pedido${t.depart?` · sale ${esc(t.depart)}`:''}${t.returnEta?` · regresa ${esc(t.returnEta)}`:''}</div>
+      <div>${esc(t.zone||'Sin zona')} · ${t.orders} pedido(s)</div>
+      <div class="mut">Ruta ${fmt(t.kmOut)} km + regreso ${fmt(t.kmBack)} km = <b style="color:#fff">${fmt(t.kmTotal)} km</b> · ${fmt(t.kmPerOrder)} km/pedido</div>
       ${t.note?`<div class="mut">📝 ${esc(t.note)}</div>`:''}
-      <div class="acts"><button class="btn sm sec" data-edit="${t.id}">Editar</button><button class="btn sm danger" data-rm="${t.id}">Eliminar</button></div></div>`;
-  }).join('');
+      <div class="acts"><button class="btn sm sec" data-edit="${t.id}">Editar</button><button class="btn sm danger" data-rm="${t.id}">Eliminar</button></div></div>`).join('');
+  });
+  $('hisList').innerHTML=any?html:'<div class="empty">No hay salidas con estos filtros.</div>';
   document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editTrip(b.dataset.edit));
   document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{
-    if(!confirm('¿Eliminar este viaje? Se descontarán sus kilómetros y contadores.'))return;
+    if(!confirm('¿Eliminar esta salida? Se descontarán sus kilómetros.'))return;
     S.trips=S.trips.filter(t=>t.id!==b.dataset.rm);save();renderAll();
   });
 }
-['hPer','hDrv','hType'].forEach(id=>$(id).onchange=renderHistory);
+['hPer','hType'].forEach(id=>$(id).onchange=renderHistory);
 function editTrip(id){
   const t=S.trips.find(x=>x.id===id);if(!t)return;
   go('reg');editingId=id;
-  fillDriverSelects();
-  $('fDriver').value=t.driverId;$('fZone').value=t.zone;$('fOrders').value=t.orders;
+  $('fZone').value=t.zone;$('fOrders').value=t.orders;
   $('fType').value=t.type;$('fOut').value=t.kmOut;$('fBack').value=t.kmBack;
   $('fDep').value=t.depart||'';$('fRet').value=t.returnEta||'';
   $('fForced').checked=!!t.forced;$('fNote').value=t.note||'';
-  $('formTitle').textContent='Editar viaje';$('btnSave').textContent='Guardar cambios';
+  $('formTitle').textContent='Editar salida';$('btnSave').textContent='Guardar cambios';
   $('btnCancel').style.display='block';updPrev();
 }
 
 // ---------- Resumen ----------
 $('rate').onchange=()=>{const v=parseFloat($('rate').value);S.rate=v>=0?v:0;save();renderSummary()};
 function renderSummary(){
-  const st=stats();
+  const ws=weekStart(Date.now()),ds=dayStart(Date.now());
+  const s={km:0,dayKm:0,orders:0,trips:0,far:0,forced:0,n:{cercano:0,medio:0,lejano:0}};
+  S.trips.forEach(t=>{
+    if(t.ts>=ws){s.trips++;s.km+=t.kmTotal;s.orders+=t.orders;s.n[t.type]++;if(t.type==='lejano')s.far+=t.kmTotal;if(t.forced)s.forced++}
+    if(t.ts>=ds)s.dayKm+=t.kmTotal;
+  });
   const rate=S.rate||0;
-  const tk=st.reduce((a,s)=>a+s.km,0),to=st.reduce((a,s)=>a+s.orders,0);
-  const cnt={cercano:0,medio:0,lejano:0,forced:0};
-  st.forEach(s=>{cnt.cercano+=s.n.cercano;cnt.medio+=s.n.medio;cnt.lejano+=s.n.lejano;cnt.forced+=s.forced});
-  $('teamBox').innerHTML=`<div class="card"><h2>Equipo — esta semana</h2><div class="grid2">
-    <div class="stat"><span class="mut">Km totales</span><span class="num">${fmt(tk)}</span></div>
-    <div class="stat"><span class="mut">Km por pedido</span><span class="num">${to?fmt(tk/to):0}</span></div>
-    <div class="stat"><span class="mut">Cercanos / Medios</span><span class="num">${cnt.cercano} / ${cnt.medio}</span></div>
-    <div class="stat"><span class="mut">Lejanos / Forzados</span><span class="num">${cnt.lejano} / ${cnt.forced}</span></div>
-    <div class="stat" style="grid-column:1/-1"><span class="mut">Gasolina estimada del equipo</span><span class="num">${money(tk*rate)}</span></div>
-  </div></div>`;
-  $('sumList').innerHTML=st.slice().sort(prioSort).map(s=>`<div class="card"><h2>${esc(s.d.name)}</h2><div class="grid2">
+  $('sumBox').innerHTML=`<div class="card"><h2>Esta semana</h2><div class="grid2">
     <div class="stat"><span class="mut">Km totales</span><span class="num">${fmt(s.km)}</span></div>
+    <div class="stat"><span class="mut">Km hoy</span><span class="num">${fmt(s.dayKm)}</span></div>
+    <div class="stat"><span class="mut">Salidas</span><span class="num">${s.trips}</span></div>
     <div class="stat"><span class="mut">Km por pedido</span><span class="num">${s.orders?fmt(s.km/s.orders):0}</span></div>
-    <div class="stat"><span class="mut">Cercanos / Medios</span><span class="num">${s.n.cercano} / ${s.n.medio}</span></div>
-    <div class="stat"><span class="mut">Lejanos / Forzados</span><span class="num">${s.n.lejano} / ${s.forced}</span></div>
+    <div class="stat"><span class="mut">Cortos / Medios</span><span class="num">${s.n.cercano} / ${s.n.medio}</span></div>
+    <div class="stat"><span class="mut">Largos / Forzados</span><span class="num">${s.n.lejano} / ${s.forced}</span></div>
     <div class="stat" style="grid-column:1/-1"><span class="mut">Gasolina estimada</span><span class="num">${money(s.km*rate)}</span></div>
-  </div>${s.far>100?`<div class="warn">⚠ ${fmt(s.far)} km en viajes lejanos: pasa de 100 km esta semana</div>`:''}</div>`).join('');
+  </div>${s.far>100?`<div class="warn">⚠ ${fmt(s.far)} km en viajes largos: pasa de 100 km esta semana</div>`:''}</div>`;
 }
 
-// ---------- Datos ----------
+// ---------- Datos (principal) ----------
 function download(name,text,mime){
   const blob=new Blob([text],{type:mime});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
@@ -509,14 +435,14 @@ function download(name,text,mime){
 const stamp=()=>new Date().toISOString().slice(0,10);
 $('btnCsv').onclick=()=>{
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
-  const head=['Fecha','Hora registro','Repartidor','Zona','Pedidos','Km ida','Km regreso','Km redondos','Km por pedido','Tipo','Forzado','Salida','Regreso estimado','Nota'];
+  const head=['Fecha','Hora registro','Zona','Pedidos','Km ruta','Km regreso','Km redondos','Km por pedido','Tipo','Forzado','Salida','Regreso','Nota'];
   const rows=S.trips.slice().sort((a,b)=>a.ts-b.ts).map(t=>{
     const d=new Date(t.ts);
-    return [d.toLocaleDateString('es-MX'),d.toLocaleTimeString('es-MX'),drvName(t.driverId),t.zone,t.orders,t.kmOut,t.kmBack,t.kmTotal,r1(t.kmPerOrder),TL[t.type],t.forced?'Sí':'No',t.depart,t.returnEta,t.note].map(q).join(',');
+    return [d.toLocaleDateString('es-MX'),d.toLocaleTimeString('es-MX'),t.zone,t.orders,t.kmOut,t.kmBack,t.kmTotal,r1(t.kmPerOrder),TL[t.type],t.forced?'Sí':'No',t.depart,t.returnEta,t.note].map(q).join(',');
   });
-  download('viajes_'+stamp()+'.csv','\uFEFF'+head.map(q).join(',')+'\n'+rows.join('\n'),'text/csv;charset=utf-8');
+  download('salidas_'+stamp()+'.csv','﻿'+head.map(q).join(',')+'\n'+rows.join('\n'),'text/csv;charset=utf-8');
 };
-$('btnJson').onclick=()=>download('respaldo_repartidores_'+stamp()+'.json',JSON.stringify(Object.assign({},S,{admin:A.byDriver}),null,2),'application/json');
+$('btnJson').onclick=()=>download('respaldo_repartos_'+stamp()+'.json',JSON.stringify(Object.assign({},S,{admin:A.byDriver}),null,2),'application/json');
 $('btnImport').onclick=()=>$('fileImport').click();
 $('fileImport').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
@@ -538,17 +464,18 @@ $('fileImport').onchange=e=>{
   r.readAsText(f);e.target.value='';
 };
 $('btnWipe').onclick=()=>{
-  const n=weekTrips().length;
-  if(!n)return alert('No hay viajes esta semana.');
-  if(!confirm(`¿Borrar los ${n} viajes de esta semana? Los repartidores se conservan. Esta acción no se puede deshacer.`))return;
   const ws=weekStart(Date.now());
+  const n=S.trips.filter(t=>t.ts>=ws).length;
+  if(!n)return alert('No hay salidas esta semana.');
+  if(!confirm(`¿Borrar las ${n} salidas de esta semana? Esta acción no se puede deshacer.`))return;
   S.trips=S.trips.filter(t=>t.ts<ws);save();renderAll();toast('Semana borrada');
 };
 
-// ---------- ADMIN ----------
-const ADMIN_PASS='1928';          // solo en memoria del código; nunca se guarda en localStorage
+/* =====================================================
+   ADMIN
+   ===================================================== */
+const ADMIN_PASS='1928';          // solo en el código; nunca se guarda en localStorage
 const IDLE_MS=10*60*1000;
-const AL={cercano:'Corta',medio:'Mediana',lejano:'Lejana'};
 let adminOn=false,lastAct=0,aEditing=null;
 
 function openModal(){$('passIn').value='';$('passErr').style.display='none';$('modal').style.display='flex';setTimeout(()=>$('passIn').focus(),50)}
@@ -561,7 +488,8 @@ function tryLogin(){
 }
 function logout(msg){
   adminOn=false;aEditing=null;aResetForm();
-  ['aCards','aPrio','aTable','aHis'].forEach(id=>$(id).innerHTML='');
+  ['aCards','aPrio','aTable','aHis','aDrvList','nOut'].forEach(id=>$(id).innerHTML='');
+  $('nKm').value='';
   $('btnAdmin').textContent='Admin';
   if($('adm').classList.contains('on'))go('reg');
   if(msg)toast(msg);
@@ -578,7 +506,6 @@ $('passCancel').onclick=closeModal;
 $('passIn').addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin()});
 $('aExit').onclick=()=>logout('Sesión Admin cerrada');
 
-function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function findA(id){
   const ks=Object.keys(A.byDriver);
   for(let i=0;i<ks.length;i++){const t=(A.byDriver[ks[i]]||[]).find(x=>x.id===id);if(t)return {t,did:ks[i]}}
@@ -603,7 +530,7 @@ function aResetForm(){
   $('aDate').value=todayISO();$('aZone').value='';$('aOut').value='';$('aBack').value='';
   $('aOrders').value=1;$('aType').value='auto';$('aForced').checked=false;
   $('aDep').value=nowHM();$('aRet').value='';$('aNote').value='';
-  $('aFormTitle').textContent='Registrar viaje (Admin)';$('aSave').textContent='Guardar viaje';
+  $('aFormTitle').textContent='Registrar salida (Admin)';$('aSave').textContent='Guardar salida';
   $('aCancel').style.display='none';$('aErr').style.display='none';aUpdKm();
 }
 function aShowErr(m){const e=$('aErr');e.textContent=m;e.style.display='block'}
@@ -613,12 +540,12 @@ $('aSave').onclick=()=>{
   const driverId=$('aDriver').value;
   if(!S.drivers.some(d=>d.id===driverId))return aShowErr('Elige un driver.');
   const date=$('aDate').value;
-  if(!date)return aShowErr('Elige la fecha del viaje.');
+  if(!date)return aShowErr('Elige la fecha de la salida.');
   const orders=Number($('aOrders').value);
   if(!Number.isInteger(orders)||orders<0||orders>99)return aShowErr('Pedidos entregados: escribe un número entero de 0 a 99.');
   const kmOut=parseFloat($('aOut').value)||0,kmBack=parseFloat($('aBack').value)||0;
   if(kmOut<0||kmBack<0)return aShowErr('Los kilómetros no pueden ser negativos.');
-  if(kmOut+kmBack<=0)return aShowErr('Los kilómetros no pueden ser 0. Captura ida y/o regreso.');
+  if(kmOut+kmBack<=0)return aShowErr('Los kilómetros no pueden ser 0. Captura la ruta y/o el regreso.');
   const dep=$('aDep').value;
   const ts=new Date(date+'T'+(dep||'12:00')+':00').getTime();
   if(isNaN(ts))return aShowErr('Fecha u hora no válida.');
@@ -636,7 +563,7 @@ $('aSave').onclick=()=>{
   if(!A.byDriver[driverId])A.byDriver[driverId]=[];
   A.byDriver[driverId].push(Object.assign({id},data));
   saveA();aResetForm();
-  toast(was?'Viaje actualizado ✔':'Viaje guardado ✔');
+  toast(was?'Salida actualizada ✔':'Salida guardada ✔');
   renderAll();
 };
 $('aCancel').onclick=aResetForm;
@@ -655,6 +582,7 @@ function aStats(){
     return s;
   });
 }
+function prioSort(a,b){return a.km-b.km||a.far-b.far||a.farN-b.farN||a.forced-b.forced}
 function recs(st){
   const sorted=st.slice().sort(prioSort);
   const groups=[];
@@ -676,11 +604,66 @@ function recs(st){
 }
 const CLS={g:'tg',y:'ty',r:'tr'};
 
+// ---------- Siguiente salida: ¿qué driver? ----------
+function nextSuggest(){
+  const box=$('nOut');
+  const km=parseFloat($('nKm').value);
+  if(!(km>0)){box.innerHTML='<div class="err" style="display:block">Escribe los km redondos de la salida (mayor a 0).</div>';return}
+  const st=aStats();
+  if(!st.length){box.innerHTML='<div class="empty">No hay drivers. Agrégalos abajo, en "Drivers".</div>';return}
+  const R=recs(st),asc=R.sorted,ov=s=>!!R.out.get(s.d.id).ov;
+  const type=classify(km);
+  let pool,order,why;
+  if(type==='lejano'){
+    pool=asc.filter(s=>!ov(s));if(!pool.length)pool=asc.slice();
+    order=pool.concat(asc.filter(s=>pool.indexOf(s)<0));
+    why='Salida LEJANA (más de 35 km): va quien lleva menos kilómetros en la semana.';
+  }else if(type==='cercano'){
+    const fl=asc.filter(ov);
+    pool=(fl.length?fl:asc.slice()).reverse();
+    order=pool.concat(asc.slice().reverse().filter(s=>pool.indexOf(s)<0));
+    why=fl.length?'Salida CORTA (hasta 15 km): se da prioridad a quien ya tiene muchos km lejanos o 2+ viajes forzados.':'Salida CORTA (hasta 15 km): va quien lleva más kilómetros en la semana.';
+  }else{
+    const mid=asc.filter(s=>R.out.get(s.d.id).c==='y'&&!ov(s));
+    pool=mid.length?mid:asc.filter(s=>!ov(s));if(!pool.length)pool=asc.slice();
+    order=pool.concat(asc.filter(s=>pool.indexOf(s)<0));
+    why='Salida MEDIANA (15.1 a 35 km): va un driver con kilometraje intermedio.';
+  }
+  const pick=pool.filter(s=>prioSort(s,pool[0])===0);
+  const others=order.filter(s=>pick.indexOf(s)<0);
+  let html=`<div class="mut" style="margin-top:12px">Salida de <b style="color:#fff">${fmt(km)} km</b> · ruta <b style="color:#fff">${AL[type]}</b></div>`;
+  if(pick.length===1){
+    const s=pick[0];
+    html+=`<div class="mut" style="margin-top:8px">Debe llevarla:</div><div class="name">${esc(s.d.name)}</div>
+      <div class="mut">${fmt(s.km)} km en la semana → quedaría en ${fmt(s.km+km)} km</div>
+      <button class="btn sm" style="width:100%;margin-top:10px" data-npick="${s.d.id}">Registrar con este driver</button>`;
+  }else{
+    html+=`<div class="mut" style="margin-top:8px">Empate. Elige quién la lleva:</div><div class="tie">${pick.map(s=>`<button class="btn sm" style="width:100%" data-npick="${s.d.id}">${esc(s.d.name)} · ${fmt(s.km)} km semana</button>`).join('')}</div>`;
+  }
+  html+=`<div class="mut" style="margin-top:10px">${why}</div>`;
+  if(others.length){
+    html+=`<h2 style="margin-top:14px">Otras opciones</h2><ol class="prio">${others.map(s=>`<li><b>${esc(s.d.name)}</b> <span class="mut">· ${fmt(s.km)} km semana · lejanos ${fmt(s.far)} km</span></li>`).join('')}</ol>`;
+  }
+  box.innerHTML=html;
+  box.querySelectorAll('[data-npick]').forEach(b=>b.onclick=()=>{
+    $('aDriver').value=b.dataset.npick;
+    toast('Driver: '+drvName(b.dataset.npick));
+    $('aFormTitle').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+}
+$('nGo').onclick=nextSuggest;
+$('nKm').addEventListener('keydown',e=>{if(e.key==='Enter')nextSuggest()});
+
+// ---------- Render admin ----------
 function renderAdmin(){
   if(!adminOn)return;
   fillAdminSelects();
+  renderAdminDrivers();
   const st=aStats(),R=recs(st);
-  if(!st.length){$('aCards').innerHTML='<div class="card"><div class="empty">No hay drivers. Agrégalos en la pestaña Repartidores.</div></div>';$('aPrio').innerHTML='';$('aTable').innerHTML='';renderAdminHistory();return}
+  if(!st.length){
+    $('aCards').innerHTML='<div class="card"><div class="empty">No hay drivers. Agrégalos abajo, en "Drivers".</div></div>';
+    $('aPrio').innerHTML='';$('aTable').innerHTML='';renderAdminHistory();return;
+  }
   $('aCards').innerHTML=st.map(s=>{
     const r=R.out.get(s.d.id),l=s.last;
     const lastTxt=l?`${new Date(l.ts).toLocaleDateString('es-MX',{day:'numeric',month:'short'})}${l.depart?' '+esc(l.depart):''} · ${esc(l.zone||'Sin zona')} · ${fmt(l.kmTotal)} km (${AL[l.type]})`:'Sin viajes';
@@ -705,6 +688,7 @@ function renderAdmin(){
     return `<tr><td data-l="Driver"><b>${esc(s.d.name)}</b></td><td data-l="Km totales">${fmt(s.km)}</td><td data-l="Km lejanos">${fmt(s.far)}</td><td data-l="Viajes lejanos">${s.farN}</td><td data-l="Viajes forzados">${s.forced}</td><td data-l="Km por pedido">${s.orders?fmt(s.km/s.orders):'—'}</td><td data-l="Recomendación" class="${CLS[r.c]}">${r.t}</td></tr>`;
   }).join('')}</tbody></table>`;
   renderAdminHistory();
+  if($('nOut').innerHTML)nextSuggest();   // mantiene la sugerencia al día
 }
 
 function renderAdminHistory(){
@@ -715,18 +699,18 @@ function renderAdminHistory(){
   const f=list.filter(t=>(!dv||t.driverId===dv)&&(!dt||t.date===dt)&&(!ty||t.type===ty)).sort((a,b)=>b.ts-a.ts);
   if(!f.length){$('aHis').innerHTML='<div class="empty">No hay viajes con estos filtros.</div>';return}
   const km=f.reduce((a,t)=>a+t.kmTotal,0);
-  $('aHis').innerHTML=`<div class="mut" style="margin-bottom:8px">${f.length} viajes · ${fmt(km)} km</div>`+f.map(t=>{
+  $('aHis').innerHTML=`<div class="mut" style="margin-bottom:8px">${f.length} salidas · ${fmt(km)} km</div>`+f.map(t=>{
     const d=new Date(t.ts);
     return `<div class="item"><div class="top"><div><b>${esc(drvName(t.driverId))}</b><br><span class="mut">${d.toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'})}${t.depart?' '+esc(t.depart):''}</span></div>
       <div><span class="pill ${t.type==='lejano'?'lejano':''}">${AL[t.type]}</span>${t.forced?'<span class="pill forz">Forzado</span>':''}</div></div>
       <div>${esc(t.zone||'Sin zona')}</div>
-      <div class="mut">ida ${fmt(t.kmOut)} + regreso ${fmt(t.kmBack)} = <b style="color:#fff">${fmt(t.kmTotal)} km</b> · ${t.orders} pedido(s)${t.orders?` · ${fmt(t.kmTotal/t.orders)} km/pedido`:''}${t.returnEta?` · regreso ${esc(t.returnEta)}`:''}</div>
+      <div class="mut">ruta ${fmt(t.kmOut)} + regreso ${fmt(t.kmBack)} = <b style="color:#fff">${fmt(t.kmTotal)} km</b> · ${t.orders} pedido(s)${t.orders?` · ${fmt(t.kmTotal/t.orders)} km/pedido`:''}${t.returnEta?` · regreso ${esc(t.returnEta)}`:''}</div>
       ${t.note?`<div class="mut">📝 ${esc(t.note)}</div>`:''}
       <div class="acts"><button class="btn sm sec" data-aedit="${t.id}">Editar</button><button class="btn sm danger" data-arm="${t.id}">Eliminar</button></div></div>`;
   }).join('');
   document.querySelectorAll('[data-aedit]').forEach(b=>b.onclick=()=>aEditTrip(b.dataset.aedit));
   document.querySelectorAll('[data-arm]').forEach(b=>b.onclick=()=>{
-    if(!confirm('¿Eliminar este viaje? Se recalcularán totales y recomendaciones.'))return;
+    if(!confirm('¿Eliminar esta salida? Se recalcularán totales y recomendaciones.'))return;
     const f2=findA(b.dataset.arm);
     if(f2){A.byDriver[f2.did]=A.byDriver[f2.did].filter(x=>x.id!==b.dataset.arm);saveA()}
     renderAll();
@@ -741,27 +725,50 @@ function aEditTrip(id){
   $('aOrders').value=t.orders;$('aType').value=t.type;$('aOut').value=t.kmOut;$('aBack').value=t.kmBack;
   $('aDep').value=t.depart||'';$('aRet').value=t.returnEta||'';
   $('aForced').checked=!!t.forced;$('aNote').value=t.note||'';
-  $('aFormTitle').textContent='Editar viaje (Admin)';$('aSave').textContent='Guardar cambios';
+  $('aFormTitle').textContent='Editar salida (Admin)';$('aSave').textContent='Guardar cambios';
   $('aCancel').style.display='block';$('aErr').style.display='none';aUpdKm();
   $('aFormTitle').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+// ---------- Drivers (solo Admin) ----------
+function renderAdminDrivers(){
+  $('aDrvList').innerHTML=S.drivers.map(d=>`<div class="item"><input data-dn="${d.id}" value="${esc(d.name)}" maxlength="40" aria-label="Nombre del driver"><div class="acts"><button class="btn sm danger" data-dd="${d.id}">Eliminar</button></div></div>`).join('')||'<div class="empty">Sin drivers.</div>';
+  document.querySelectorAll('[data-dn]').forEach(i=>i.onchange=()=>{
+    const d=S.drivers.find(x=>x.id===i.dataset.dn),v=i.value.trim();
+    if(d&&v){d.name=v;save();renderAll()}else if(d){i.value=d.name}
+  });
+  document.querySelectorAll('[data-dd]').forEach(b=>b.onclick=()=>{
+    const d=S.drivers.find(x=>x.id===b.dataset.dd);if(!d)return;
+    const cnt=(A.byDriver[d.id]||[]).length;
+    if(!confirm(`¿Eliminar a ${d.name}?${cnt?` Se borrarán también sus ${cnt} salidas registradas en Admin.`:''}`))return;
+    S.drivers=S.drivers.filter(x=>x.id!==d.id);
+    S.trips=S.trips.filter(t=>t.driverId!==d.id);
+    delete A.byDriver[d.id];saveA();save();renderAll();
+  });
+}
+$('aAddDrv').onclick=()=>{
+  const n=$('aNewDrv').value.trim();
+  if(!n)return alert('Escribe un nombre.');
+  S.drivers.push({id:uid(),name:n});$('aNewDrv').value='';save();renderAll();
+};
+
+// ---------- Datos Admin ----------
 $('aCsv').onclick=()=>{
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
-  const head=['Fecha','Driver','Destino/zona','Km ida','Km regreso','Km redondos','Pedidos entregados','Tipo de ruta','Forzado','Salida','Regreso','Nota'];
+  const head=['Fecha','Driver','Destino/zona','Km ruta','Km regreso','Km redondos','Pedidos entregados','Tipo de ruta','Forzado','Salida','Regreso','Nota'];
   const rows=[];
   S.drivers.forEach(d=>(A.byDriver[d.id]||[]).forEach(t=>rows.push(t)));
   rows.sort((a,b)=>a.ts-b.ts);
   const body=rows.map(t=>[t.date,drvName(t.driverId),t.zone,t.kmOut,t.kmBack,t.kmTotal,t.orders,AL[t.type],t.forced?'Sí':'No',t.depart,t.returnEta,t.note].map(q).join(','));
-  download('admin_viajes_'+stamp()+'.csv','\uFEFF'+head.map(q).join(',')+'\n'+body.join('\n'),'text/csv;charset=utf-8');
+  download('admin_salidas_'+stamp()+'.csv','﻿'+head.map(q).join(',')+'\n'+body.join('\n'),'text/csv;charset=utf-8');
 };
 $('aJson').onclick=()=>$('btnJson').onclick();
 $('aImport').onclick=()=>$('fileImport').click();
 $('aWipe').onclick=()=>{
   const ws=weekStart(Date.now());
   let n=0;S.drivers.forEach(d=>(A.byDriver[d.id]||[]).forEach(t=>{if(t.ts>=ws)n++}));
-  if(!n)return alert('No hay viajes Admin esta semana.');
-  if(!confirm(`¿Borrar los ${n} viajes Admin de esta semana? No se puede deshacer.`))return;
+  if(!n)return alert('No hay salidas Admin esta semana.');
+  if(!confirm(`¿Borrar las ${n} salidas Admin de esta semana? No se puede deshacer.`))return;
   Object.keys(A.byDriver).forEach(k=>{A.byDriver[k]=(A.byDriver[k]||[]).filter(t=>t.ts<ws)});
   saveA();renderAll();toast('Semana Admin borrada');
 };
@@ -769,7 +776,7 @@ aResetForm();
 
 // ---------- Render general ----------
 function renderAll(){
-  fillDriverSelects();renderDrivers();renderHistory();renderSummary();renderAdmin();
+  renderHistory();renderSummary();renderAdmin();
   $('rate').value=S.rate;
 }
 resetForm();renderAll();
